@@ -189,7 +189,7 @@ while True:
                 start = True
                 bird.boing()
 
-        elif start:
+        if start:
             if event.type == pipe_timer:
                 randColour = c(pipe_colour)
                 get_random_pipes(screen_width + 310, randColour)
