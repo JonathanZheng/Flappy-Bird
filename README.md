@@ -1,4 +1,4 @@
-# Flappy-Bird-Clone
+# Flappy-Bird
 
 Flappy Bird but with additional features! (still incomplete for now)
 
