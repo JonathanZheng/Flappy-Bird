@@ -1,6 +1,6 @@
 # Flappy-Bird
 
-Flappy Bird but with additional features! (still incomplete for now)
+pygame version of flappy Bird but with additional features! (still incomplete for now)
 
 some references from https://github.com/sourabhv/FlapPyBird
 
