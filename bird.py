@@ -212,14 +212,14 @@ def redraw_screen(): # Not optimal
         screen.blit(begin_msg, (110, 150))
         ground_group.update()
 
-    else:
+    else: 
         pipe_group.draw(screen) # Lose/Main Loop
 
-        if not lose:
-            pipe_group.update() # Main Loop
-            ground_group.update() # Lose
+        if not lose: # Main Loop
+            pipe_group.update() 
+            ground_group.update() 
 
-        else:
+        else: # Lose
             screen.blit(game_over_msg, (110, 120))
         
     ground_group.draw(screen)
