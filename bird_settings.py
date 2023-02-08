@@ -73,8 +73,8 @@ SOUNDS['swoosh'] = pygame.mixer.Sound('audio/swoosh.wav')
 SOUNDS['wing']   = pygame.mixer.Sound('audio/wing.wav')
 
 BACKGROUND = (
-    pygame.image.load('sprites/background-day.png').convert_alpha(),
-    pygame.image.load('sprites/background-night.png').convert_alpha()
+    pygame.image.load('sprites/background-day.png'),
+    pygame.image.load('sprites/background-night.png')
 )
 
 begin_msg = pygame.image.load('sprites/message.png').convert_alpha()
