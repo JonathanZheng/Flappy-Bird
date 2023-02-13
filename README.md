@@ -1,4 +1,4 @@
-# Flappy-Bird
+# Flappy-Bird-Clone
 
 pygame version of flappy Bird but with additional features!
 
