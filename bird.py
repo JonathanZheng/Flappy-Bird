@@ -139,7 +139,7 @@ def initialise():
     ground_group.add(ground2)
 
     pygame.time.set_timer(pipe_timer, 1500)
-    pygame.time.set_timer(lvl_up_timer, 7000)
+    pygame.time.set_timer(lvl_up_timer, 8000)
 
 def restart(): 
     global start, lose, score, store, speed, game_speed, pipe_vert_speed, bird_group, pipe_group, ground_group, bird, background
@@ -149,7 +149,7 @@ def restart():
     score = 0
     store = 0
     speed = 19
-    game_speed = 10
+    game_speed = 10 
     pipe_vert_speed = 1
 
     bird_group.empty()
@@ -208,11 +208,11 @@ def redraw_screen(): # Not optimal
     screen.blit(background, (0, 0))
     bird_group.update()
 
-    if not start: # Start
+    if not start: # Beginning
         screen.blit(begin_msg, (110, 150))
         ground_group.update()
 
-    else: 
+    else:
         pipe_group.draw(screen) # Lose/Main Loop
 
         if not lose: # Main Loop
@@ -220,7 +220,7 @@ def redraw_screen(): # Not optimal
             ground_group.update() 
 
         else: # Lose
-            screen.blit(game_over_msg, (110, 120))
+            screen.blit(game_over_msg, (110, 120)) 
         
     ground_group.draw(screen)
     bird_group.draw(screen)
@@ -242,13 +242,13 @@ while True:
                 bird.boing()
                 start = True
 
-            elif event.key == K_RETURN and lose:
+            elif event.key == K_RETURN and (lose or not start):
                 restart()
 
         elif start and not lose:
             if event.type == pipe_timer:
                 randColour = c(pipe_colour)
-                get_random_pipes(screen_width + 310, randColour)
+                get_random_pipes(screen_width + 300, randColour)
 
             if event.type == lvl_up_timer:
                 if game_speed < max_game_speed:
@@ -260,8 +260,8 @@ while True:
 
     if start: 
         display_scores()
-
-    if start and not lose: 
-        collision_test()
+        
+        if not lose: 
+            collision_test()
 
     pygame.display.flip()
