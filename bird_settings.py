@@ -8,10 +8,10 @@ screen_height = 600
 score = 0
 store = 0
 
-gravity = 2.5
-speed = 19
-game_speed = 10
-max_game_speed = 15
+gravity = 2.3
+speed = 20
+game_speed = 12
+max_game_speed = 30
 
 pipe_width = 75
 pipe_height = 550

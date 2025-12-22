@@ -1,11 +1,20 @@
 import pygame
 from random import choice as c, randint as r
-from pygame.locals import *
+from pygame.locals import QUIT, KEYDOWN, K_ESCAPE, K_SPACE, K_UP, K_RETURN, K_RSHIFT
 from bird_settings import *
+
+# Global variables - will be initialized in initialise() function
+bird1: 'Bird'
+bird2: 'Bird'
+bird_group: 'pygame.sprite.Group'
+pipe_group: 'pygame.sprite.Group'
+
+ground_group: 'pygame.sprite.Group'
+background: 'pygame.Surface'
 
 class Bird(pygame.sprite.Sprite):
 
-    def __init__(self, randBird):
+    def __init__(self, randBird, x_pos=None, y_pos=None):
         pygame.sprite.Sprite.__init__(self)
         self.idx = 0
         self.speed = speed
@@ -22,7 +31,14 @@ class Bird(pygame.sprite.Sprite):
         self.image = self.images[self.idx]
         self.og_image = self.image.copy()
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(topleft = (screen_width / 5, screen_height / 2.8))
+        
+        # Set default positions if not provided
+        if x_pos is None:
+            x_pos = screen_width / 5
+        if y_pos is None:
+            y_pos = screen_height / 2.8
+            
+        self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
 
     def boing(self): 
         if self.rect.bottom >= 0:
@@ -40,7 +56,7 @@ class Bird(pygame.sprite.Sprite):
 
         if start and not self.hitGround:
             self.speed += gravity
-            self.rect.y += self.speed 
+            self.rect.y += int(self.speed)  # Convert float to int for pygame rect
     
             self.check_hitGround()
 
@@ -48,11 +64,14 @@ class Bird(pygame.sprite.Sprite):
             self.idx = (self.idx + 1) % 3
             self.image = self.images[self.idx]
 
-        elif self.angle >= -90 and not self.hitGround:
+        elif not self.hitGround:
+            # After game over, keep falling and rotating until hitting the ground
+            self.speed += gravity
+            self.rect.y += int(self.speed)
+            self.angle = max(self.angle - 15, -90)
             self.image = pygame.transform.rotozoom(self.og_image, self.angle, 1)
-            self.angle -= 15
-
             self.rect = self.image.get_rect(center = self.rect.center)
+            self.check_hitGround()
 
 class Pipe(pygame.sprite.Sprite):
 
@@ -121,14 +140,16 @@ class Ground(pygame.sprite.Sprite):
 
 
 def initialise():
-    global bird_group, pipe_group, ground_group, bird, background
+    global bird_group, pipe_group, ground_group, bird1, bird2, background
 
     background = BACKGROUND[r(0, len(BACKGROUND) - 1)].convert_alpha()
     background = pygame.transform.scale(background, (screen_width, screen_height))
 
     bird_group = pygame.sprite.Group()
-    bird = Bird(r(0, len(BIRDS) - 1))
-    bird_group.add(bird)
+    bird1 = Bird(r(0, len(BIRDS) - 1), screen_width / 5, screen_height / 2.8)
+    bird2 = Bird(r(0, len(BIRDS) - 1), screen_width / 5 + 50, screen_height / 2.8)
+    bird_group.add(bird1)
+    bird_group.add(bird2)
 
     pipe_group = pygame.sprite.Group()
 
@@ -142,7 +163,7 @@ def initialise():
     pygame.time.set_timer(lvl_up_timer, 8000)
 
 def restart(): 
-    global start, lose, score, store, speed, game_speed, pipe_vert_speed, bird_group, pipe_group, ground_group, bird, background
+    global start, lose, score, store, speed, game_speed, pipe_vert_speed, bird_group, pipe_group, ground_group, bird1, bird2, background
 
     start = False
     lose = False
@@ -176,11 +197,16 @@ def get_random_pipes(x_pos, colour):
 def collision_test():
     global lose
 
-    if (pygame.sprite.groupcollide(bird_group, ground_group, False, False, pygame.sprite.collide_mask)
-     or pygame.sprite.groupcollide(bird_group, pipe_group, False, False, pygame.sprite.collide_mask)):
+    # Check if either bird hits the ground or pipes
+    bird1_ground = pygame.sprite.spritecollide(bird1, ground_group, False, pygame.sprite.collide_mask)
+    bird1_pipe = pygame.sprite.spritecollide(bird1, pipe_group, False, pygame.sprite.collide_mask)
+    bird2_ground = pygame.sprite.spritecollide(bird2, ground_group, False, pygame.sprite.collide_mask)
+    bird2_pipe = pygame.sprite.spritecollide(bird2, pipe_group, False, pygame.sprite.collide_mask)
 
+    # if bird1_ground or bird1_pipe or bird2_ground or bird2_pipe:
+    if bird1_ground or bird1_pipe or bird2_ground or bird2_pipe:
         SOUNDS['hit'].play()
-
+        # Do NOT set hitGround here; let check_hitGround() handle it when the bird actually hits the ground
         lose = True
 
 def display_scores():
@@ -239,7 +265,11 @@ while True:
                 quit()
 
             elif (event.key == K_SPACE or event.key == K_UP) and not lose:
-                bird.boing()
+                bird1.boing()
+                start = True
+
+            elif event.key == K_RSHIFT and not lose:
+                bird2.boing()
                 start = True
 
             elif event.key == K_RETURN and (lose or not start):
